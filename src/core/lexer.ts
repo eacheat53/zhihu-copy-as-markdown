@@ -331,3 +331,31 @@ const Tokenize = (node: Element | string): TokenTextType[] => {
 
 	return res;
 };
+
+
+/**
+ * 想法 Lexer
+ * @param dom - 想法的 DOM 元素
+ * @returns LexType 数组
+ */
+export const pinsLexer = (dom: HTMLElement): LexType[] => {
+	const res: TokenText = {
+		type: TokenType.Text,
+		content: [],
+	};
+
+	const text = dom.innerText;
+
+	text.split("\n").forEach((line) => {
+		res.content.push({
+			type: TokenType.PlainText,
+			text: line,
+		} as TokenTextPlain);
+
+		res.content.push({
+			type: TokenType.BR,
+		} as TokenTextBr);
+	});
+
+	return [res];
+};

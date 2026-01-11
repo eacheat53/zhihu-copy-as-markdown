@@ -51,31 +51,31 @@ export function saveObsidianConfig(config: Partial<ObsidianConfig>): void {
  * Windows/macOS/Linux 文件系统禁止的字符：< > : " / \ | ? * 以及控制字符
  */
 function sanitizeFilename(filename: string): string {
-    if (!filename || typeof filename !== 'string') {
-        return 'untitled';
+    if (!filename || typeof filename !== "string") {
+        return "untitled";
     }
 
     return filename
         // 移除所有控制字符（包括换行、回车、制表符等）
-        .replace(/[\x00-\x1f\x7f-\x9f]/g, '')
+        .replace(/[\x00-\x1f\x7f-\x9f]/g, "")
         // 移除或替换文件系统非法字符
-        .replace(/[<>:"/\\|?*]/g, '-')
+        .replace(/[<>:"/\\|?*]/g, "-")
         // 移除 Unicode 零宽字符和其他不可见字符
-        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        .replace(/[\u200B-\u200D\uFEFF]/g, "")
         // 替换连续空白字符为单个空格
-        .replace(/\s+/g, ' ')
+        .replace(/\s+/g, " ")
         // 移除前后空格
         .trim()
         // 移除连续的点（避免 .. 等）
-        .replace(/\.{2,}/g, '.')
+        .replace(/\.{2,}/g, ".")
         // 移除文件名开头和结尾的点和空格
-        .replace(/^[.\s]+|[.\s]+$/g, '')
+        .replace(/^[.\s]+|[.\s]+$/g, "")
         // 限制长度（Windows 文件名最大255字节，保守起见限制200字符）
         .substring(0, 200)
         // 再次移除末尾的空格和点
-        .replace(/[.\s]+$/, '')
+        .replace(/[.\s]+$/, "")
         // 如果清理后为空，使用默认名称
-        || 'untitled';
+        || "untitled";
 }
 
 /**
@@ -133,11 +133,11 @@ export function generateObsidianMarkdown(
         ];
 
         for (const pattern of linesToRemove) {
-            result = result.replace(pattern, '');
+            result = result.replace(pattern, "");
         }
 
         // 清理开头多余的空行
-        result = result.replace(/^\n+/, '');
+        result = result.replace(/^\n+/, "");
 
         // 添加 frontmatter
         result = frontmatter + result;

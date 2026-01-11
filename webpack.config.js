@@ -6,7 +6,7 @@ import HtmlWebpackPlugin from "html-webpack-plugin";
 const __dirname = path.resolve();
 
 const devConfig = {
-    entry: "./src/entry.ts",
+    entry: "./src/index.ts",
     devtool: "source-map",
     module: {
         rules: [
@@ -40,7 +40,7 @@ const devConfig = {
 export default (env, argv) => {
     if (argv.mode === "production") {
         return {
-            entry: "./src/entry.ts",
+            entry: "./src/index.ts",
             module: {
                 rules: [
                     {

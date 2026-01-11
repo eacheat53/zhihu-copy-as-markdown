@@ -1,17 +1,13 @@
 {
   "name": "zhihu-downloader",
-  "version": "0.3.44",
+  "version": "0.3.47",
   "scripts": {
-    "dev": "run-s build:test start",
+    "dev": "run-p watch serve",
     "start": "run-p watch serve",
     "serve": "live-server ./dist",
     "watch": "webpack --mode development --watch",
-    "build:production": "webpack --mode production",
-    "build:tampermonkey": "node ./scripts/build-tampermonkey.js",
-    "build": "run-s build:update build:production build:tampermonkey",
-    "build:update": "node ./scripts/add-version.js",
-    "build:test": "node ./scripts/build-test-html.js",
-    "lint": "eslint --fix --ext .js,.ts ./src ./scripts webpack.config.js"
+    "build": "webpack --mode production",
+    "lint": "eslint --fix --ext .js,.ts ./src webpack.config.js"
   },
   "devDependencies": {
     "html-webpack-plugin": "^5.5.3",
