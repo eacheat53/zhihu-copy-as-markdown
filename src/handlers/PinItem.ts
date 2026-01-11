@@ -5,6 +5,9 @@ import { TokenType } from "../core/tokenTypes";
 import type { LexType, TokenFigure } from "../core/tokenTypes";
 import * as utils from "../core/utils";
 import savelex from "../core/savelex";
+import type { FrontmatterData } from "../core/frontmatter";
+import { generateFrontmatter } from "../core/frontmatter";
+import { buildMetadata } from "../core/headerBuilder";
 
 export default async (dom: HTMLElement): Promise<{
     lex: LexType[],
@@ -12,6 +15,7 @@ export default async (dom: HTMLElement): Promise<{
     zip: JSZip,
     title: string,
     itemId: string,
+    metadata: FrontmatterData,
 }> => {
     const lex = lexer(dom);
 
@@ -48,22 +52,16 @@ export default async (dom: HTMLElement): Promise<{
         return { zop: null, zaExtra: null };
     })();
 
-    const
-        author = utils.getAuthor(dom),
-        url = "https://www.zhihu.com/pin/" + zop.itemId;
-
-    // 添加头部信息
+    const author = utils.getAuthor(dom);
+    const url = "https://www.zhihu.com/pin/" + zop.itemId;
     const authorName = author?.name || "未知作者";
-    const header = [
-        `作者：${authorName}`,
-        `链接：${url}`,
-        `来源：知乎`,
-        `著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。`,
-        `---`
-    ];
 
-    // 合并头部和内容
-    const markdown = [...header, ...contentMarkdown];
+    // 构建元数据
+    const metadata = buildMetadata("想法", authorName, url);
+
+    // 使用 YAML frontmatter 格式
+    const frontmatter = generateFrontmatter(metadata);
+    const markdown = [frontmatter + contentMarkdown.join("\n\n")];
 
     const zip = await savelex(lex);
 
@@ -79,5 +77,6 @@ export default async (dom: HTMLElement): Promise<{
         zip,
         title: "想法",
         itemId: zop.itemId,
+        metadata,
     }
 };

@@ -4,6 +4,9 @@ import { LexType } from "../core/tokenTypes";
 import { parser } from "../core/parser";
 import * as utils from "../core/utils";
 import savelex from "../core/savelex";
+import type { FrontmatterData } from "../core/frontmatter";
+import { generateFrontmatter } from "../core/frontmatter";
+import { buildMetadata } from "../core/headerBuilder";
 
 
 // 生成8位UUID
@@ -22,6 +25,7 @@ export default async (dom: HTMLElement): Promise<{
     zip: JSZip,
     title: string,
     itemId: string,
+    metadata: FrontmatterData,
 }> => {
     const lex = lexer(dom.childNodes as NodeListOf<Element>);
 
@@ -58,22 +62,17 @@ export default async (dom: HTMLElement): Promise<{
 
     const title = utils.getTitle(dom), author = utils.getAuthor(dom);
     const url = utils.getURL(dom);
+    const authorName = author?.name || "未知作者";
 
-    // 生成 Markdown 内容
+    // 生成 Markdown 内容（仅正文）
     const contentMarkdown = parser(lex);
 
-    // 添加头部信息
-    const authorName = author?.name || "未知作者";
-    const header = [
-        `作者：${authorName}`,
-        `链接：${url}`,
-        `来源：知乎`,
-        `著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。`,
-        `---`
-    ];
+    // 构建元数据
+    const metadata = buildMetadata(title, authorName, url);
 
-    // 合并头部和内容
-    const markdown = [...header, ...contentMarkdown];
+    // 使用 YAML frontmatter 格式
+    const frontmatter = generateFrontmatter(metadata);
+    const markdown = [frontmatter + contentMarkdown.join("\n\n")];
 
     const zip = await savelex(lex);
     zip.file("info.json", JSON.stringify({
@@ -85,5 +84,5 @@ export default async (dom: HTMLElement): Promise<{
 
     const itemId = (zop || {}).itemId || getUUID();
 
-    return { lex, markdown, zip, title: title, itemId };
+    return { lex, markdown, zip, title: title, itemId, metadata };
 };

@@ -1,9 +1,9 @@
 
 import { saveAs } from "file-saver";
 import { MakeButton, getParent } from "./core/utils";
-import NormalItem from "./situation/NormalItem";
+import NormalItem from "./handlers/NormalItem";
 import * as JSZip from "jszip";
-import PinItem from "./situation/PinItem";
+import PinItem from "./handlers/PinItem";
 import {
 	selectObsidianVault,
 	saveToObsidian,
@@ -12,6 +12,7 @@ import {
 	saveObsidianConfig,
 } from "./core/obsidianSaver";
 import type { LexType } from "./core/tokenTypes";
+import type { FrontmatterData } from "./core/frontmatter";
 
 type ResultType = {
 	markdown: string[],
@@ -21,6 +22,7 @@ type ResultType = {
 	itemId?: string,
 	question?: boolean,
 	lex: LexType[],
+	metadata?: FrontmatterData,
 };
 
 const allResults: ResultType[] = [];
@@ -118,6 +120,7 @@ const main = async () => {
 					dom: RichText,
 					itemId: res.itemId,
 					lex: res.lex,
+					metadata: res.metadata,
 				};
 			} else {
 				// 回答
@@ -131,6 +134,7 @@ const main = async () => {
 					dom: RichText,
 					itemId: res.itemId,
 					lex: res.lex,
+					metadata: res.metadata,
 				};
 
 				if (getParent(RichText, "QuestionRichText")) {
@@ -145,8 +149,6 @@ const main = async () => {
 			// 保存到 Obsidian
 			const ButtonObsidian = MakeButton();
 			ButtonObsidian.innerHTML = "保存到Obsidian";
-			ButtonObsidian.style.width = "100px";
-			ButtonObsidian.style.marginLeft = ".2em";
 			ButtonContainer.prepend(ButtonObsidian);
 
 			ButtonObsidian.addEventListener("click", async () => {
@@ -169,7 +171,8 @@ const main = async () => {
 						result.markdown,
 						result.lex,
 						obsidianVaultHandle,
-						config
+						config,
+						result.metadata
 					);
 
 					if (saveResult.success) {
@@ -197,10 +200,6 @@ const main = async () => {
 			// 下载为Zip
 			const ButtonZipDownload = MakeButton();
 			ButtonZipDownload.innerHTML = "下载全文为Zip";
-			ButtonZipDownload.style.borderRadius = "0 1em 1em 0";
-			ButtonZipDownload.style.width = "100px";
-			ButtonZipDownload.style.paddingRight = ".4em";
-
 			ButtonContainer.prepend(ButtonZipDownload);
 
 			ButtonZipDownload.addEventListener("click", async () => {
@@ -226,8 +225,6 @@ const main = async () => {
 			// 复制为Markdown
 			const ButtonCopyMarkdown = MakeButton();
 			ButtonCopyMarkdown.innerHTML = "复制为Markdown";
-			ButtonCopyMarkdown.style.borderRadius = "1em 0 0 1em";
-			ButtonCopyMarkdown.style.paddingLeft = ".4em";
 			ButtonContainer.prepend(ButtonCopyMarkdown);
 
 			ButtonCopyMarkdown.addEventListener("click", () => {
@@ -263,24 +260,12 @@ const main = async () => {
 
 		// 批量保存到 Obsidian 按钮
 		const ButtonBatchObsidian = MakeButton();
-		ButtonBatchObsidian.style.width = "105px";
-		ButtonBatchObsidian.style.fontSize = "13px";
-		ButtonBatchObsidian.style.lineHeight = "13px";
-		ButtonBatchObsidian.style.margin = "0";
-		ButtonBatchObsidian.style.marginRight = ".4em";
 		ButtonBatchObsidian.innerHTML = "批量保存到Obsidian";
-
 		ButtonBatchObsidian.classList.add("zhihucopier-button");
 
 		// 批量下载按钮
 		const Button = MakeButton();
-		Button.style.width = "75px";
-		// Button.style.height = "30px";
-		Button.style.fontSize = "13px";
-		Button.style.lineHeight = "13px";
-		Button.style.margin = "0";
 		Button.innerHTML = "批量下载";
-
 		Button.classList.add("zhihucopier-button");
 
 
@@ -288,7 +273,6 @@ const main = async () => {
 			titleItem.append(ButtonBatchObsidian);
 			titleItem.append(Button);
 		} else {
-			Button.style.marginRight = ".4em";
 			titleItem.prepend(Button);
 			titleItem.prepend(ButtonBatchObsidian);
 		}
@@ -320,6 +304,7 @@ const main = async () => {
 					markdown: item.markdown,
 					lex: item.lex,
 					itemId: item.itemId,
+					metadata: item.metadata,
 				}));
 
 				const saveResult = await batchSaveToObsidian(
@@ -329,28 +314,22 @@ const main = async () => {
 				);
 
 				if (saveResult.success) {
-					ButtonBatchObsidian.style.width = "130px";
 					ButtonBatchObsidian.innerHTML = "保存成功✅";
 					setTimeout(() => {
 						ButtonBatchObsidian.innerHTML = "批量保存到Obsidian";
-						ButtonBatchObsidian.style.width = "105px";
 					}, 2000);
 				} else {
-					ButtonBatchObsidian.style.width = "130px";
 					ButtonBatchObsidian.innerHTML = "保存失败❌";
 					alert(saveResult.message);
 					setTimeout(() => {
 						ButtonBatchObsidian.innerHTML = "批量保存到Obsidian";
-						ButtonBatchObsidian.style.width = "105px";
 					}, 2000);
 				}
 			} catch (err) {
 				console.error(err);
-				ButtonBatchObsidian.style.width = "190px";
-				ButtonBatchObsidian.innerHTML = "发生未知错误，请联系开发者";
+				ButtonBatchObsidian.innerHTML = "发生错误";
 				setTimeout(() => {
 					ButtonBatchObsidian.innerHTML = "批量保存到Obsidian";
-					ButtonBatchObsidian.style.width = "105px";
 				}, 2000);
 			}
 		});
@@ -364,19 +343,15 @@ const main = async () => {
 
 			try {
 				downloadAllResults();
-				Button.style.width = "90px";
 				Button.innerHTML = "下载成功✅";
 				setTimeout(() => {
 					Button.innerHTML = "批量下载";
-					Button.style.width = "75px";
 				}, 1000);
 
 			} catch {
-				Button.style.width = "190px";
-				Button.innerHTML = "发生未知错误，请联系开发者";
+				Button.innerHTML = "发生错误";
 				setTimeout(() => {
 					Button.innerHTML = "批量下载";
-					Button.style.width = "75px";
 				}, 1000);
 			}
 		});

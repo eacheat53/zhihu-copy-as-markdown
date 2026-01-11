@@ -254,3 +254,14 @@ export type LexType =
     TokenVideo |
     TokenGif
     ;
+
+
+/**
+ * Represents author information.
+ */
+export type AuthorType = {
+    name: string;
+    url: string;
+    badge?: string;
+    icon?: string;
+};

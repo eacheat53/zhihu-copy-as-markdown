@@ -16,14 +16,3 @@ export async function downloadAndZip(url: string, zip: JSZip): Promise<{ zip: JS
 	zip.file(fileName, arrayBuffer);
 	return { zip, file_name: fileName };
 }
-
-/**
- * 下载一系列文件并将其添加到zip文件中
- * @param urls 下载文件的URL
- * @param zip JSZip对象，用于创建zip文件
- * @returns 添加了下载文件的zip文件
- */
-export async function downloadAndZipAll(urls: string[], zip: JSZip): Promise<JSZip> {
-	for (let url of urls) zip = (await downloadAndZip(url, zip)).zip;
-	return zip;
-}

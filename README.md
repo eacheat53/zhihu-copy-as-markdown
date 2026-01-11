@@ -18,6 +18,8 @@
 
 ### 功能特点
 
+- ✅ **现代化 UI**：全新设计的按钮样式，支持悬停动效和渐变背景，完美融入知乎界面
+- ✅ **YAML Frontmatter**：保存到 Obsidian 时自动生成标准 YAML 头部（标题、作者、链接、创建时间）
 - ✅ **直接保存到本地**：使用 File System Access API 直接保存文件到本地 Obsidian 路径
 - ✅ **支持中文路径**：完美支持包含中文的文件路径
 - ✅ **自动管理附件**：图片和视频自动保存到 `Attachments` 子文件夹
@@ -52,7 +54,7 @@
 ### 文件结构示例
 
 单个回答保存：
-```
+```text
 Your Obsidian Vault/
 ├── Attachments/
 │   ├── image1.jpg
@@ -61,7 +63,7 @@ Your Obsidian Vault/
 ```
 
 批量保存：
-```
+```text
 Your Obsidian Vault/
 └── 问题标题/
     ├── Attachments/
@@ -101,7 +103,6 @@ pnpm build
 1. 获取页面中所有的富文本框 `DOM`
 2. 将 `DOM` 使用 `./src/lexer.ts` 转换为 `Lex`
 3. 将 `Lex` 使用 `./src/parser.ts` 转换为 `Markdown`
-
 
 ## TODO
 

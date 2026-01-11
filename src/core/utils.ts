@@ -1,4 +1,4 @@
-import type { AuthorType } from "./types";
+import type { AuthorType } from "./tokenTypes";
 
 /**
  * Converts a Zhihu link to a normal link.
@@ -147,25 +147,57 @@ export const getURL = (dom: HTMLElement): string => {
 
 
 /**
- * Make a button element.
- * @returns A button element.
+ * Make a button element with modern styling.
+ * @returns A styled button element.
  */
 export const MakeButton = (): HTMLButtonElement => {
 	const $button = document.createElement("button");
 	$button.setAttribute("type", "button");
 	$button.classList.add("zhihucopier-button");
 	$button.innerText = "";
-	$button.style.right = "0";
-	$button.style.top = "-2em";
-	$button.style.zIndex = "999";
-	$button.style.width = "120px";
-	$button.style.height = "2em";
-	$button.style.backgroundColor = "rgba(85, 85, 85, 0.9)";
-	$button.style.color = "white";
-	$button.style.outline = "none";
-	$button.style.cursor = "pointer";
-	$button.style.borderRadius = "1em";
-	$button.style.margin = "0 .2em 1em .2em";
-	$button.style.fontSize = ".8em";
+
+	// 现代化样式
+	Object.assign($button.style, {
+		position: "relative",
+		zIndex: "999",
+		padding: "6px 14px",
+		height: "28px",
+		fontSize: "12px",
+		fontWeight: "500",
+		color: "#fff",
+		background: "linear-gradient(135deg, #0066ff 0%, #0984e3 100%)",
+		border: "none",
+		borderRadius: "14px",
+		cursor: "pointer",
+		outline: "none",
+		margin: "0 4px 8px 4px",
+		boxShadow: "0 2px 8px rgba(0, 102, 255, 0.3)",
+		transition: "all 0.2s ease",
+		whiteSpace: "nowrap",
+		backdropFilter: "blur(8px)",
+	});
+
+	// Hover 效果
+	$button.addEventListener("mouseenter", () => {
+		$button.style.transform = "translateY(-1px)";
+		$button.style.boxShadow = "0 4px 12px rgba(0, 102, 255, 0.4)";
+		$button.style.background = "linear-gradient(135deg, #0052cc 0%, #0770c7 100%)";
+	});
+
+	$button.addEventListener("mouseleave", () => {
+		$button.style.transform = "translateY(0)";
+		$button.style.boxShadow = "0 2px 8px rgba(0, 102, 255, 0.3)";
+		$button.style.background = "linear-gradient(135deg, #0066ff 0%, #0984e3 100%)";
+	});
+
+	// Active 效果
+	$button.addEventListener("mousedown", () => {
+		$button.style.transform = "translateY(0) scale(0.98)";
+	});
+
+	$button.addEventListener("mouseup", () => {
+		$button.style.transform = "translateY(-1px)";
+	});
+
 	return $button;
 };

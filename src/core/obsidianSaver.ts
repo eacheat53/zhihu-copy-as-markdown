@@ -1,5 +1,6 @@
 import * as JSZip from "jszip";
 import { LexType, TokenType } from "./tokenTypes";
+import { generateFrontmatter, type FrontmatterData } from "./frontmatter";
 
 /**
  * Obsidian 保存器配置
@@ -104,13 +105,43 @@ export async function selectObsidianVault(): Promise<FileSystemDirectoryHandle |
 /**
  * 生成 Obsidian 兼容的 Markdown 内容
  * 将图片路径转换为 Obsidian 的 [[attachments/filename]] 或 ![](Attachments/filename) 格式
+ * @param markdown Markdown 内容数组
+ * @param lex Lex 数组
+ * @param config Obsidian 配置
+ * @param metadata 可选的 frontmatter 元数据
  */
 export function generateObsidianMarkdown(
     markdown: string[],
     lex: LexType[],
-    config: ObsidianConfig
+    config: ObsidianConfig,
+    metadata?: FrontmatterData
 ): string {
     let result = markdown.join("\n\n");
+
+    // 如果有 metadata，则生成 frontmatter 并移除正文中的旧头部
+    if (metadata) {
+        const frontmatter = generateFrontmatter(metadata);
+
+        // 移除旧格式的头部信息（作者、链接、来源等）
+        // 这些信息现在在 frontmatter 中
+        const linesToRemove = [
+            /^作者：.*$/m,
+            /^链接：.*$/m,
+            /^来源：知乎$/m,
+            /^著作权归作者所有。.*$/m,
+            /^---$/m,
+        ];
+
+        for (const pattern of linesToRemove) {
+            result = result.replace(pattern, '');
+        }
+
+        // 清理开头多余的空行
+        result = result.replace(/^\n+/, '');
+
+        // 添加 frontmatter
+        result = frontmatter + result;
+    }
 
     // 清理附件文件夹名
     const safeAttachmentFolder = sanitizeFilename(config.attachmentFolder);
@@ -158,6 +189,7 @@ export function generateObsidianMarkdown(
  * @param lex Lex 数组
  * @param vaultHandle Obsidian vault 目录句柄
  * @param config Obsidian 配置
+ * @param metadata 可选的 frontmatter 元数据
  */
 export async function saveToObsidian(
     zip: JSZip,
@@ -165,7 +197,8 @@ export async function saveToObsidian(
     markdown: string[],
     lex: LexType[],
     vaultHandle: FileSystemDirectoryHandle,
-    config: ObsidianConfig
+    config: ObsidianConfig,
+    metadata?: FrontmatterData
 ): Promise<SaveToObsidianResult> {
     try {
         // 1. 创建或获取 Attachments 文件夹
@@ -200,8 +233,8 @@ export async function saveToObsidian(
             }
         }
 
-        // 3. 生成 Obsidian 兼容的 Markdown
-        const obsidianMarkdown = generateObsidianMarkdown(markdown, lex, config);
+        // 3. 生成 Obsidian 兼容的 Markdown（包含 frontmatter）
+        const obsidianMarkdown = generateObsidianMarkdown(markdown, lex, config, metadata);
 
         // 4. 保存 Markdown 文件到 vault 根目录
         const safeTitle = sanitizeFilename(title);
@@ -238,6 +271,7 @@ export async function batchSaveToObsidian(
         markdown: string[];
         lex: LexType[];
         itemId?: string;
+        metadata?: FrontmatterData;
     }>,
     vaultHandle: FileSystemDirectoryHandle,
     questionTitle: string
@@ -284,11 +318,12 @@ export async function batchSaveToObsidian(
                 }
             }
 
-            // 生成并保存 Markdown
+            // 生成并保存 Markdown（包含 frontmatter）
             const obsidianMarkdown = generateObsidianMarkdown(
                 item.markdown,
                 item.lex,
-                config
+                config,
+                item.metadata
             );
             const combinedTitle = `${item.title}-${item.itemId || "unknown"}`;
             const safeTitle = sanitizeFilename(combinedTitle);

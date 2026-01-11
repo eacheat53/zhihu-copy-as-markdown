@@ -2,7 +2,6 @@ import path from "path";
 import webpack from "webpack";
 import fs from "fs";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import UglifyJsPlugin from "uglifyjs-webpack-plugin";
 
 const __dirname = path.resolve();
 
@@ -26,7 +25,7 @@ const devConfig = {
         path: path.resolve(__dirname, "dist"),
     },
     plugins: [
-        ...fs.readdirSync("./test").map((file) => {
+        ...(fs.existsSync("./test") ? fs.readdirSync("./test").map((file) => {
             console.log(file)
             if (file.endsWith(".html")) {
                 return new HtmlWebpackPlugin({
@@ -34,7 +33,7 @@ const devConfig = {
                     template: `./test/${file}`,
                 });
             }
-        }),
+        }) : []),
     ],
 };
 
@@ -65,17 +64,9 @@ export default (env, argv) => {
                 filename: "bundle.min.js",
                 path: path.resolve(__dirname, "dist"),
             },
-            plugins: [
-                new UglifyJsPlugin({
-                    uglifyOptions: {
-                        compress: {
-                            drop_console: true,
-                            drop_debugger: true,
-                            pure_funcs: ["console.log"],
-                        },
-                    },
-                }),
-            ]
+            optimization: {
+                minimize: false,  // 不压缩，生成可读 JS
+            },
         };
     } else return devConfig;
 };
