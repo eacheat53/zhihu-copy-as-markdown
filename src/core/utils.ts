@@ -159,9 +159,13 @@ export const MakeButton = (): HTMLButtonElement => {
 	// 现代化样式
 	Object.assign($button.style, {
 		position: "relative",
-		zIndex: "999",
+		zIndex: "1",  // 降低层级，避免遮挡知乎弹窗
+		display: "inline-flex",  // 使用 flexbox 居中
+		alignItems: "center",
+		justifyContent: "center",
 		padding: "6px 14px",
 		height: "28px",
+		lineHeight: "1",  // 配合 flexbox 居中
 		fontSize: "12px",
 		fontWeight: "500",
 		color: "#fff",
@@ -174,7 +178,7 @@ export const MakeButton = (): HTMLButtonElement => {
 		boxShadow: "0 2px 8px rgba(0, 102, 255, 0.3)",
 		transition: "all 0.2s ease",
 		whiteSpace: "nowrap",
-		backdropFilter: "blur(8px)",
+		verticalAlign: "middle",  // 与相邻元素垂直对齐
 	});
 
 	// Hover 效果
