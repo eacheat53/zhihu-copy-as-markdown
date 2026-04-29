@@ -2,14 +2,14 @@
 
 一键复制知乎文章/回答/想法为Markdown，下载文章/回答/想法为zip（包含素材图片与文章/回答/想法信息），**支持直接保存到本地 Obsidian 笔记**，备份你珍贵的回答与文章。
 
-安装地址：<https://greasyfork.org/zh-CN/scripts/478608>
+安装地址：<https://greasyfork.org/zh-CN/scripts/551793>
 
 安装完毕后会在每个回答、想法、文章的左上角出现三个按钮：`复制为Markdown`、`下载全文为Zip`、`保存到Obsidian`，点击即可复制、下载或保存到 Obsidian。
 
 每个问题的标题上会多出两个按钮：`批量下载` 和 `批量保存到Obsidian`，点击后即可下载/保存该问题下所有已经加载的回答。
 
-![截图](resources/screenshot1.png)
-
+![截图](assets/image_12.png)
+![截图](assets/image_13.png)
 `下载全文为Zip`和`批量下载`都会将所有的内容（包括图片、视频等附件）一同打包并下载，备份您和他人的劳动成果。
 
 ## 新功能：保存到 Obsidian
@@ -54,6 +54,7 @@
 ### 文件结构示例
 
 单个回答保存：
+
 ```text
 Your Obsidian Vault/
 ├── Attachments/
@@ -63,6 +64,7 @@ Your Obsidian Vault/
 ```
 
 批量保存：
+
 ```text
 Your Obsidian Vault/
 └── 问题标题/
@@ -83,20 +85,19 @@ Your Obsidian Vault/
 pnpm i
 ```
 
-2. 测试
+1. 测试
 
 ```bash
 pnpm dev
 ```
 
-3. 打包
+1. 打包
 
 ```bash
 pnpm build
 ```
 
 `dist/tampermonkey-script.js` 即为脚本，复制到油猴即可使用。
-
 
 ## 原理
 
@@ -109,4 +110,3 @@ pnpm build
 - [ ] 下载文章时同时包含头图
 - [ ] TOC解析
 - [ ] Markdown纯文本转义
-
